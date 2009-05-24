@@ -6,6 +6,8 @@ require 'mini_magick'
 require 'debuggable'
 require 'argument_tools'
 
+BarcodeSegmenterError = Class.new(StandardError)
+
 class BarcodeSegmenter
   
   include Camellia
@@ -24,7 +26,13 @@ class BarcodeSegmenter
     image = CamImage.new
 
     # load picture, only 24 bit (truecolor) BMP images
-    image.load_bmp(file_path)
+    
+    magick_image = MiniMagick::Image.from_file(file_path)
+    magick_image.depth "24"
+    magick_image.format "bmp"
+    magick_image.write "#{file_path}.bmp" 
+    
+    image.load_bmp("#{file_path}.bmp")
 
     # convert to YUV encoding: http://en.wikipedia.org/wiki/YUV
     yuv = image.to_yuv
@@ -37,6 +45,11 @@ class BarcodeSegmenter
 
     # labeling
     blobs = threshold.labeling!
+    
+    unless blobs
+      raise BarcodeSegmenterError, "No barcode detected!"
+    end
+    
     out "#{blobs.nb_blobs} blobs detected before filtering"
 
     # 10 % of the entire image is "too large"
@@ -49,6 +62,10 @@ class BarcodeSegmenter
       reject { |b| b.surface < too_small_area || b.surface > too_large_area }
 
     out "#{filtered.length} blobs after filtering"
+    
+    if filtered.length == 0
+      raise BarcodeSegmenterError, "No barode detected!"
+    end
 
     b_left_small = yuv.width
     b_left_large = 0
@@ -62,6 +79,12 @@ class BarcodeSegmenter
       b_top_small = b.top if b.top < b_top_small
       b_top_large = b.top + b.height if b.top > b_top_large
     end
+    
+    #increase bounding box size by 30 pixel square
+    b_left_small -= 30
+    b_top_small -= 30
+    b_left_large += 30
+    b_top_large += 30
 
     out "Bounding box: (#{b_left_small}, #{b_top_small}) to  (#{b_left_large}, #{b_top_large})."
 
@@ -79,6 +102,8 @@ class BarcodeSegmenter
     magick_image = MiniMagick::Image.from_file(file_path)
     magick_image.crop "#{b_left_large - b_left_small}x#{b_top_large - b_top_small}+#{b_left_small}+#{b_top_small}"
     magick_image.write file_output_path
+  ensure
+    system("rm #{"#{file_path}.bmp"}")
     
   end
     

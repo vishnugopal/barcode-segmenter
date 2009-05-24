@@ -1,4 +1,4 @@
-test/large*.bmp
+test/large*.*
 .DS_Store
 out*.*
 cropped.*

@@ -24,11 +24,7 @@ ruby barcode_segmenter.rb test/medium2.bmp medium-segmented.bmp
 
 Important:
 
-All input should be a 24-bit truecolor BMP image, convert using (for e.g.):
-convert input.jpg -depth 24 barcode_for_processing.bmp
-(convert is installed when you install ImageMagick)
-
-You can pass any ImageMagick supported filetype as the output.
+You can pass any ImageMagick supported filetype as the input or output.
 
 To debug:
 
