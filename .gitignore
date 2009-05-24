@@ -1,0 +1,4 @@
+test/large*.bmp
+.DS_Store
+out*.*
+cropped.*

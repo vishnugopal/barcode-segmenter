@@ -1,0 +1,44 @@
+
+
+Barcode Segmenter is a tool that crops out barcodes from larger images.
+
+Dependencies:
+
+* Camellia at http://camellia.sourceforge.net/
+* Camellia Ruby Gem at http://rubyforge.org/frs/download.php/30340/camellia-2.7.0-x86-linux.gem
+* Mini Magick at http://github.com/bmo/mini_magick/tree/master
+* ImageMagick at http://www.imagemagick.org/
+
+
+OSX installation is tricky and is described here:
+http://po-ru.com/diary/camellia-and-ruby-on-mac-os-x/
+(also see comments)
+
+How does it work:
+
+It uses the Camellia Image detection engine to isolate barcode-like blobs in an image. A contiguous area of such blobs is then isolated and cropped off the main image.
+
+To use:
+
+ruby barcode_segmenter.rb test/medium2.bmp medium-segmented.bmp
+
+Important:
+
+All input should be a 24-bit truecolor BMP image, convert using (for e.g.):
+convert input.jpg -depth 24 barcode_for_processing.bmp
+(convert is installed when you install ImageMagick)
+
+You can pass any ImageMagick supported filetype as the output.
+
+To debug:
+
+Just pass "debug=true" as the third parameter, for e.g:
+ruby barcode_segmenter.rb test/medium2.bmp medium-segmented.bmp debug=true
+
+--
+  This code is released under GPLv2. 
+  To get a copy of the license visit http://www.gnu.org/copyleft/gpl.html
+  
+  Copyright (C) Vishnu Gopal. 2009.
+  
+  Vishnu Gopal. May 2009.
